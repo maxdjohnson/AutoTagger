@@ -3,8 +3,7 @@
 """
 backup.py
 
-Created by Max Johnson on 2009-08-17.
-Copyright (c) 2009 __MyCompanyName__. All rights reserved.
+I will replace this with the shelve module
 """
 
 import sys

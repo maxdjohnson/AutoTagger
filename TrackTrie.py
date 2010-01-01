@@ -10,7 +10,7 @@ Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 import sys
 import os
 import unittest
-from iTunesMac import *
+import iTunesMac as Library
 from editdist import distance
 		
 class TrackTrie(dict):
@@ -63,7 +63,7 @@ class TrackTrieTests(unittest.TestCase):
 		pass
 	
 	def testKeys(self):
-		track = Track()
+		track = Library.Track()
 		track["name"] = "trackName"
 		track["artist"] = "trackArtist"
 		track["year"] = 2000
@@ -75,5 +75,5 @@ class TrackTrieTests(unittest.TestCase):
 		self.assertEqual(len(trie), 1)
 
 
-if __name__ == '__main__':
-	unittest.main()
+#if __name__ == '__main__':
+#	unittest.main()

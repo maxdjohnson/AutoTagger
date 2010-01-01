@@ -7,22 +7,19 @@ Created by Max Johnson on 2009-12-21.
 Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 """
 
-import sys
-import os
-import unittest
 import socket
 from random import randrange
 from base64 import b64decode
 import re
 from hashlib import md5
 import urllib
-import zlib
-from iTunesMac import *
+import iTunesMac as Library
+import plistlib
 
 def search(info):
 	host = "ax.search.itunes.apple.com"
 	#ERROR this breaks when the thing gets weird unicode letters
-	path = "/WebObjects/MZSearch.woa/wa/advancedSearch?media=all&searchButton=submit&allArtistNames=" + urllib.quote(info[1]) + "&allTitle=" + urllib.quote(info[0]) + "&flavor=0&mediaType=1&ringtone=0"
+	path = "/WebObjects/MZSearch.woa/wa/advancedSearch?media=all&searchButton=submit&allArtistNames=" + urllib.quote(info[1].encode("utf-8")) + "&allTitle=" + urllib.quote(info[0].encode("utf-8")) + "&flavor=0&mediaType=1&ringtone=0"
 	url = "http://"+host+path
 	ua = "iTunes/7.0 (Macintosh; U; PPC Mac OS X 10.4.7)"
 	
@@ -44,45 +41,36 @@ def search(info):
 		fileobj.write(msg)
 		result = fileobj.read()
 		
-		index = result.rfind("<key>listType</key><string>search</string>")
-		if result[:15] == "HTTP/1.1 200 OK" and index != -1 : break
-	
-	#TODO: unescape html entities
-	#You know what, this entire thing should really just use an html parser. I dunno why i did this by hand
-	result = result[index:]
-	
-	reg = re.compile("<key>([^<]*)<\\/key><(?:integer|string)>([^<]*)<\\/(?:integer|string)>")
-	startIndex = 0
-	endIndex = 0
-	while True:
 		try:
-			startIndex = result.index("<dict>", endIndex)
-			endIndex = result.index("</dict>", startIndex)
-		except: break;
+			header, body = result.split("\r\n\r\n", 2)
+			string = body[body.rindex("<plist"):body.rindex("</plist>")+8]
+		except ValueError:
+			continue
 		
-		entry = result[startIndex:endIndex]
-		track = Track()
-		kind = "song"
-		for match in reg.finditer(entry):
-			k = match.group(1)
-			v = match.group(2)
-			
-			if k == "artistName": track["artist"] = v
-			if k == "composerName": track["composer"] = v
-			if k == "duration": track["duration"] = float(v)/1000
-			if k == "genre": track["genre"] = v
-			if k == "itemName": track["name"] = v
-			if k == "kind": kind = v
-			if k == "playlistName": 
-				v.replace(" - Single", "")
-				v.replace(" (Original Motion Picture Soundtrack)", "")
-				track["album"] = v
-			if k == "popularity": pass
-			if k == "trackCount": track["trackCount"] = int(v)
-			if k == "trackNumber": track["trackNum"] = int(v)
-			if k == "year": track["year"] = int(v)
-		
-		if kind != "song": continue
+		if header.startswith("HTTP/1.1 200 OK"):
+			break
+	
+	tracklist = plistlib.readPlistFromString(string)
+	for item in filter(lambda i: i["kind"] == "song", tracklist["items"]):
+		track = Library.Track()
+		if "artistName" in item: 
+			track["artist"] = item["artistName"]
+		if "composerName" in item: 
+			track["composer"] = item["composerName"]
+		if "duration" in item: 
+			track["duration"] = float(item["duration"])/1000
+		if "genre" in item: 
+			track["genre"] = item["genre"]
+		if "itemName" in item: 
+			track["name"] = item["itemName"]
+		if "playlistName" in item: 
+			track["album"] = item["playlistName"].replace(" - Single", "").replace(" (Original Motion Picture Soundtrack)", "")
+		if "trackCount" in item: 
+			track["trackCount"] = item["trackCount"]
+		if "trackNumber" in item: 
+			track["trackNum"] = item["trackNumber"]
+		if "year" in item: 
+			track["year"] = item["year"]
 		yield track
 
 def validation(url, ua):
@@ -92,12 +80,3 @@ def validation(url, ua):
 	url_end = re.match(".*/.*/.*(/.+)$", url).group(1)
 	digest = md5(url_end + ua + static + random).digest()
 	return random + '-' + digest.upper()
-
-
-class iTMSTests(unittest.TestCase):
-	def setUp(self):
-		pass
-
-
-if __name__ == '__main__':
-	unittest.main()

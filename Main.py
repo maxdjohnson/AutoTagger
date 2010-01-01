@@ -9,12 +9,12 @@ Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 
 import sys
 import os
-from AutoTag import *
+from AutoTag import run, undo, refine
 
+
+#needs to be replaced by some UI
 def main():
-	mode = "run"
-	if mode == "run":
-		run();
+	run();
 
 
 if __name__ == '__main__':

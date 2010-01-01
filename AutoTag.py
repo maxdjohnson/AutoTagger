@@ -7,12 +7,9 @@ Created by Max Johnson on 2009-08-15.
 Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 """
 
-import sys
-import os
-import unittest
 import re
 
-from iTunesMac import *
+import iTunesMac as Library
 from TrackTrie import TrackTrie
 import iTMS
 from backup import BackupDB
@@ -20,7 +17,7 @@ from backup import BackupDB
 backup = BackupDB("./backup.plist")
 
 def run():
-	tracks = getSelected()
+	tracks = Library.getSelected()
 	for track in tracks:
 		candidates = TrackTrie()
 		for permutation in PermutationGenerator(track.lookupInfo):
@@ -36,7 +33,7 @@ def run():
 	backup.write()
 
 def undo():
-	tracks = getSelected()
+	tracks = Library.getSelected()
 	for track in tracks:
 		try:
 			orig = backup.fetch(track)
@@ -45,7 +42,7 @@ def undo():
 		track.save()
 
 def refine():
-	tracks = getSelected()
+	tracks = Library.getSelected()
 	track = tracks[0]
 	candidates = TrackTrie()
 	for permutation in PermutationGenerator(track.lookupInfo):
@@ -133,12 +130,3 @@ def PermutationGenerator(searchInfo):
 		counter += 1
 
 
-class AutoTagTests(unittest.TestCase):
-	#plug some bogus track info and assert that the permutation generator fixes it
-	def setUp(self):
-		pass
-
-
-if __name__ == '__main__':
-	#unittest.main()
-	undo()

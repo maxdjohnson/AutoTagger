@@ -3,14 +3,15 @@
 """
 backup.py
 
-I will replace this with the shelve module
+Created by Max Johnson on 2009-08-17.
+Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 """
 
 import sys
 import os
 import unittest
 import plistlib
-from iTunesMac import *
+import iTunesMac as Library
 
 class BackupDB(object):
 	def __init__(self, path):
@@ -21,7 +22,7 @@ class BackupDB(object):
 			self.pl = dict()
 	
 	def store(self, track):
-		s = Track()
+		s = Library.Track()
 		s.replace(track)
 		self.pl[str(track.track.databaseID())] = s
 	

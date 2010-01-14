@@ -7,18 +7,20 @@ Created by Max Johnson on 2009-12-21.
 Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 """
 
-import socket
+import sys, socket, re, urllib, plistlib
 from random import randrange
 from base64 import b64decode
-import re
 from hashlib import md5
-import urllib
-import iTunesMac as Library
-import plistlib
+if sys.platform == 'darwin':
+	import iTunesMac as Library
+elif sys.platform == 'win32':
+	#import iTunesWin as Library
+	raise NotImplementedError('AutoTagger is not yet supported on windows')
+else:
+    raise NotImplementedError('AutoTagger is not supported on this OS')
 
 def search(info):
 	host = "ax.search.itunes.apple.com"
-	#ERROR this breaks when the thing gets weird unicode letters
 	path = "/WebObjects/MZSearch.woa/wa/advancedSearch?media=all&searchButton=submit&allArtistNames=" + urllib.quote(info[1].encode("utf-8")) + "&allTitle=" + urllib.quote(info[0].encode("utf-8")) + "&flavor=0&mediaType=1&ringtone=0"
 	url = "http://"+host+path
 	ua = "iTunes/7.0 (Macintosh; U; PPC Mac OS X 10.4.7)"

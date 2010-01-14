@@ -7,48 +7,57 @@ Created by Max Johnson on 2009-08-15.
 Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 """
 
-import re
-
-import iTunesMac as Library
+import sys, re, iTMS, db
 from TrackTrie import TrackTrie
-import iTMS
-from backup import BackupDB
+from ThreadRiver import ThreadRiver
+if sys.platform == 'darwin':
+	import iTunesMac as Library
+elif sys.platform == 'win32':
+	#import iTunesWin as Library
+	raise NotImplementedError('AutoTagger is not yet supported on windows')
+else:
+	raise NotImplementedError('AutoTagger is not supported on this OS')
 
-backup = BackupDB("./backup.plist")
+#import logging
+#logging.basicConfig(level=logging.INFO, filename='AutoTag.log')
 
-def run():
-	tracks = Library.getSelected()
-	for track in tracks:
-		candidates = TrackTrie()
-		for permutation in PermutationGenerator(track.lookupInfo):
-			for candidate in iTMS.search(permutation):
-				if abs(candidate["duration"] - track["duration"]) <= 3:
-					candidates.add(candidate)
-			if len(candidates) != 0: break
-		if len(candidates) == 0: continue
-		best = candidates.pick(track)
-		backup.store(track)
-		track.replace(best)
-		track.save()
-	backup.write()
-
-def undo():
-	tracks = Library.getSelected()
-	for track in tracks:
-		try:
-			orig = backup.fetch(track)
-		except: continue
-		track.replace(orig)
-		track.save()
-
-def refine():
-	tracks = Library.getSelected()
-	track = tracks[0]
+def fix(track):
+#	logging.info("Fixing %(artist)s - $(name)s (%(duration)d):" % track)
 	candidates = TrackTrie()
 	for permutation in PermutationGenerator(track.lookupInfo):
 		for candidate in iTMS.search(permutation):
-			candidates.add(candidate)
-	return candidates
+			if abs(candidate["duration"] - track["duration"]) <= db.config('max_song_delta'):
+#				logging.info("    found candidate: %(artist)s - $(name)s (%(duration)d)" % track)
+				candidates.add(candidate)
+			else:
+#				logging.info("    found candidate: %(artist)s - $(name)s (%(duration)d), rejected due to time mismatch" % track)
+				pass
+		if len(candidates) != 0: break
+	if len(candidates) == 0: 
+#		logging.info("    No suitable candidates found")
+		return
+	best = candidates.pick(track)
+#	logging.info("    Picked best: %(artist)s - $(name)s (%(duration)d)" % best)
+	db.store(track)
+	track.replace(best)
+	track.save()
+#	logging.info("    Track saved.")
+
+def undo(track):
+	try:
+		orig = db.fetch(track)
+	except: return
+	track.replace(orig)
+	track.save()
+
+#def refine():
+#	tracks = Library.getSelected()
+#	track = tracks[0]
+#	candidates = TrackTrie()
+#	for permutation in PermutationGenerator(track.lookupInfo):
+#		for candidate in iTMS.search(permutation):
+#			candidates.add(candidate)
+#	return candidates
 
 def PermutationGenerator(searchInfo):
 	"""

@@ -7,11 +7,15 @@ Created by Max Johnson on 2009-08-16.
 Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 """
 
-import sys
-import os
-import unittest
-import iTunesMac as Library
+import sys, unittest
 from editdist import distance
+if sys.platform == 'darwin':
+	import iTunesMac as Library
+elif sys.platform == 'win32':
+	#import iTunesWin as Library
+	raise NotImplementedError('AutoTagger is not yet supported on windows')
+else:
+	raise NotImplementedError('AutoTagger is not supported on this OS')
 		
 class TrackTrie(dict):
 	def __init__(self):

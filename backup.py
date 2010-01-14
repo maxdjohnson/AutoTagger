@@ -11,7 +11,13 @@ import sys
 import os
 import unittest
 import plistlib
-import iTunesMac as Library
+if sys.platform == 'darwin':
+	import iTunesMac as Library
+elif sys.platform == 'win32':
+	#import iTunesWin as Library
+	raise NotImplementedError('AutoTagger is not yet supported on windows')
+else:
+    raise NotImplementedError('AutoTagger is not supported on this OS')
 
 class BackupDB(object):
 	def __init__(self, path):

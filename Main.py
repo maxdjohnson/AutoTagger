@@ -9,12 +9,15 @@ Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 
 import sys
 import os
-from AutoTag import run, undo, refine
+from wxMain import MyApp
 
 
 #needs to be replaced by some UI
 def main():
-	run();
+	app = MyApp(False)
+	app.MainLoop()
+
+
 
 
 if __name__ == '__main__':

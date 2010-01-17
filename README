@@ -1,15 +1,11 @@
-Note: This is mac-only for the time being. 
-
-There is no UI yet, it will look up song info for whatever is selected in iTunes
-To revert the selected songs in case AutoTagger mis-tags them, change run() to undo() in Main.py
+Note: This is mac-only for the time being.
 
 The program works like this:
 1. Loop through selected songs in iTunes
 2. Generate permutations of the title/artist, for example removing parentheses in the title, or splitting titles like "artist - title" into the artist and title fields
-3. Look up the permutations in the iTunes store until it finds a matches within 3s of the correct track duration
+3. Look up the permutations in the iTunes store until it finds a match within 3s of the correct track duration
 4. Pick the best match based on the artist similarity, title similarity, and earliest year
 5. Back up the track info
 6. Replace the track info with the new info
 
 If it can't find a matching track in the iTunes store, it just skips it. 
-In the future, I would like it to let the user pick from a list of candidate tracks

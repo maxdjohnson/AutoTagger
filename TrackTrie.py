@@ -9,20 +9,18 @@ Copyright (c) 2009 __MyCompanyName__. All rights reserved.
 
 import sys, unittest
 from editdist import distance
-if sys.platform == 'darwin':
-	import iTunesMac as Library
-elif sys.platform == 'win32':
-	#import iTunesWin as Library
-	raise NotImplementedError('AutoTagger is not yet supported on windows')
-else:
-	raise NotImplementedError('AutoTagger is not supported on this OS')
 		
 class TrackTrie(dict):
+	"""Creates a Trie (Dictionary of dictionaries) of tracks for the purpose 
+	of organizing them so a 'best' can be picked
+	"""
+	
 	def __init__(self):
 		super(TrackTrie, self).__init__()
 		self.count = 0
 		
 	def add(self, track):
+		"""Add a track to the Trie, keyed by artist, name, then year"""
 		self.addRecurse(track, [track["artist"], track["name"], track["year"]])
 	
 	def addRecurse(self, track, info):
@@ -41,6 +39,9 @@ class TrackTrie(dict):
 		return add
 	
 	def pick(self, track):
+		"""Pick the best track from the trie by walking down the trie based on 
+		levenshtein. Ties are broken by taking the earliest year
+		"""
 		return self.pickRecurse(track, [track["artist"], track["name"]])
 	
 	def pickRecurse(self, track, info):
@@ -67,7 +68,8 @@ class TrackTrieTests(unittest.TestCase):
 		pass
 	
 	def testKeys(self):
-		track = Library.Track()
+		from track import Track
+		track = Track()
 		track["name"] = "trackName"
 		track["artist"] = "trackArtist"
 		track["year"] = 2000

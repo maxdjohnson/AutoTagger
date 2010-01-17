@@ -1,25 +1,19 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-iTMS.py
+'''
+Created on Dec 21, 2010
 
-Created by Max Johnson on 2009-12-21.
-Copyright (c) 2009 __MyCompanyName__. All rights reserved.
-"""
+@author: maxjohnson
+
+This is the interface to the iTunes Music Library
+'''
 
 import sys, socket, re, urllib, plistlib
 from random import randrange
 from base64 import b64decode
 from hashlib import md5
-if sys.platform == 'darwin':
-	import iTunesMac as Library
-elif sys.platform == 'win32':
-	#import iTunesWin as Library
-	raise NotImplementedError('AutoTagger is not yet supported on windows')
-else:
-    raise NotImplementedError('AutoTagger is not supported on this OS')
+from track import Track
 
 def search(info):
+	"""Searches the iTunes Music Library for a track"""
 	host = "ax.search.itunes.apple.com"
 	path = "/WebObjects/MZSearch.woa/wa/advancedSearch?media=all&searchButton=submit&allArtistNames=" + urllib.quote(info[1].encode("utf-8")) + "&allTitle=" + urllib.quote(info[0].encode("utf-8")) + "&flavor=0&mediaType=1&ringtone=0"
 	url = "http://"+host+path
@@ -35,7 +29,7 @@ def search(info):
 		msg += "X-Apple-Store-Front: 143441\r\n"
 		msg += "User-Agent: "+ua+"\r\n"
 		msg += "Accept-Language: en-us, en;q=0.50\r\n"
-		msg += "X-Apple-Validation: "+validation(url, ua)
+		msg += "X-Apple-Validation: "+_validation(url, ua)
 		msg += "Accept-Encoding: gzip, x-aes-cbc\r\n"
 		msg += "Connection: close\r\n"
 		msg += "Host: " + host + "\r\n\r\n"
@@ -54,7 +48,7 @@ def search(info):
 	
 	tracklist = plistlib.readPlistFromString(string)
 	for item in filter(lambda i: i["kind"] == "song", tracklist["items"]):
-		track = Library.Track()
+		track = Track()
 		if "artistName" in item: 
 			track["artist"] = item["artistName"]
 		if "composerName" in item: 
@@ -75,8 +69,8 @@ def search(info):
 			track["year"] = item["year"]
 		yield track
 
-def validation(url, ua):
-	"""generates x-apple-validation"""
+def _validation(url, ua):
+	"""generates x-apple-_validation"""
 	random = "%04X%04X" % (randrange(0x10000), randrange(0x10000))
 	static = b64decode("ROkjAaKid4EUF5kGtTNn3Q==")
 	url_end = re.match(".*/.*/.*(/.+)$", url).group(1)

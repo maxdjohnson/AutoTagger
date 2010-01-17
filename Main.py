@@ -1,24 +1,14 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-Main.py
+'''
+Created on Aug 21, 2010
 
-Created by Max Johnson on 2009-08-21.
-Copyright (c) 2009 __MyCompanyName__. All rights reserved.
-"""
+@author: maxjohnson
+'''
 
-import sys
-import os
-from wxMain import MyApp
+from controller import Controller
 
-
-#needs to be replaced by some UI
 def main():
-	app = MyApp(False)
+	app = Controller(False)
 	app.MainLoop()
-
-
-
 
 if __name__ == '__main__':
 	main()

@@ -21,13 +21,15 @@ for k, v in _defaults.items():
         _db[k] = v
 
 def store(track):
+    """Stores track in the database for later retrieval with fetch(track)"""
     _dblock.acquire()
     try:
-        _db[str(track.track.databaseID())] = track.copy()
+        _db[str(track.uid)] = track.copy()
     finally:
         _dblock.release()
 
 def fetch(track):
+    """Fetches stored track from database"""
     _dblock.acquire()
     try:
         return _db[str(track.uid)]
@@ -35,6 +37,7 @@ def fetch(track):
         _dblock.release()
 
 def config(k):
+    """Gets configuration value"""
     _dblock.acquire()
     try:
         return _db[k]
@@ -42,6 +45,7 @@ def config(k):
         _dblock.release()
 
 def setConfig(k, v):
+    """Sets configuration value"""
     _dblock.acquire()
     try:
         _db[k] = v

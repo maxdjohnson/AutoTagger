@@ -9,6 +9,7 @@ import db
 
 class Main(wx.Frame):
     """ The main frame for the window, displaying short instructions and buttons for fix and undo """
+    
     def __init__(self):
         wx.Frame.__init__(self, None , -1, "AutoTagger", size=(390, 90))
         
@@ -54,7 +55,7 @@ class Running(wx.Frame):
     """Window that displays feedback from currently running threads"""
     
     def __init__(self):
-        wx.Frame.__init__(self, None , -1, "Running...", size=(390, 300))
+        wx.Frame.__init__(self, None , -1, "Running...", size=(390, 240))
         
         MenuBar = wx.MenuBar()
         

@@ -10,41 +10,43 @@ import db
 from tracktrie import TrackTrie
 
 def fix(track, callback):
+    """Looks up the track and fixes it if possible, calling the callback with status updates"""
     callback("Fixing %(artist)s - $(name)s (%(duration)d):" % track)
     candidates = TrackTrie()
-    for permutation in PermutationGenerator(track.lookupInfo):
+    for permutation in _PermutationGenerator(track.lookupInfo):
         for candidate in itms.search(permutation):
             if abs(candidate["duration"] - track["duration"]) <= db.config('max_song_delta'):
-                callback("    found candidate: %(artist)s - $(name)s (%(duration)d)" % track)
+                callback("found candidate: %(artist)s - $(name)s (%(duration)d)" % track)
                 candidates.add(candidate)
             else:
-                callback("    found candidate: %(artist)s - $(name)s (%(duration)d), rejected due to time mismatch" % track)
+                callback("found candidate: %(artist)s - $(name)s (%(duration)d), rejected due to time mismatch" % track)
                 pass
         if len(candidates) != 0: break
     if len(candidates) == 0: 
-        callback("    No suitable candidates found")
+        callback("No suitable candidates found")
         return
     best = candidates.pick(track)
-    callback("    Picked best: %(artist)s - $(name)s (%(duration)d)" % best)
+    callback("Picked best: %(artist)s - $(name)s (%(duration)d)" % best)
     db.store(track)
     track.replace(best)
     track.save()
 
 def undo(track, callback):
+    """Replaces the track with the stored version in the database"""
     callback("Looking up in database")
     try:
         orig = db.fetch(track)
-    except:
+    except KeyError:
         callback("Not Found") 
         return
     callback("Found, saving")
     track.replace(orig)
     track.save()
 
-def PermutationGenerator(searchInfo):
+def _PermutationGenerator(searchInfo):
     """
     takes a searchInfo (3-tuple of track, artist, duration) and generates permutations
-    should be iterated over, i.e. for permutation in PermutationGenerator(searchInfo):
+    should be iterated over, i.e. for permutation in _PermutationGenerator(searchInfo):
     """
     #first, yield the parameter. With any luck, it will be found and we don't have to do any more generation
     generated = [(searchInfo[0].strip(), searchInfo[1].strip())]

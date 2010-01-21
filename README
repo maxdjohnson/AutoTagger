@@ -1,5 +1,10 @@
 Note: This is mac-only for the time being.
 
+Requires:
+Python 2.5 or 2.6
+wxpython (http://www.wxpython.org/)
+py-editdist (http://www.mindrot.org/projects/py-editdist/)
+
 The program works like this:
 1. Loop through selected songs in iTunes
 2. Generate permutations of the title/artist, for example removing parentheses in the title, or splitting titles like "artist - title" into the artist and title fields

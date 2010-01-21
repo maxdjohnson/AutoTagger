@@ -18,7 +18,7 @@ class Main(wx.Frame):
         FileMenu = wx.Menu()
         self.menu_exit = FileMenu.Append(wx.ID_EXIT, text = "&Exit")
 #        self.menu_prefs = FileMenu.Append(wx.ID_PREFERENCES, text = "&Preferences")
-#        self.menu_log = FileMenu.Append(-1, text = "&View Log")
+#        self.menu_log = FileMenu.Append(-1, text = "View &Log")
         MenuBar.Append(FileMenu, "&File")
         
         HelpMenu = wx.Menu()

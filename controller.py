@@ -91,17 +91,17 @@ class Controller(wx.App):
         
     def OnAbout(self, event):
         """Called when the user selects About from the menu bar"""
-        dlg = wx.MessageDialog(self.view_main, "This is a small program to test\n"
-                                     "the use of menus on Mac, etc.\n",
-                                "About Me", wx.OK | wx.ICON_INFORMATION)
+        dlg = wx.MessageDialog(self.view_main, "AutoTagger, an open-source music tag fixer for iTunes\n"
+                                     "Author Max Johnson (maxdjohnson@gmail.com)\n",
+                                "About AutoTagger", wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
     
     def OnHelp(self, event):
         """Called when the user selects Help from the menu bar"""
-        dlg = wx.MessageDialog(self.view_main, "This would be help\n"
-                                     "If there was any\n",
-                                "Test Help", wx.OK | wx.ICON_INFORMATION)
+        dlg = wx.MessageDialog(self.view_main, "AutoTagger is a fairly simple tool. You select the tracks that are mis-tagged in iTunes, and then click the \"Fix\" button in AutoTagger. \n"
+                               "If it messes up and mis-tags a song, you can always revert it by selecting the song(s) and pressing undo.",
+                               "AutoTagger Help", wx.OK | wx.ICON_INFORMATION)
         dlg.ShowModal()
         dlg.Destroy()
 
